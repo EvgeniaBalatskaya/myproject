@@ -24,6 +24,7 @@ media/
 staticfiles/
 __pycache__/
 
+
 # VS Code / PyCharm
 .vscode/
 .idea/
