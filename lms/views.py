@@ -1,36 +1,31 @@
-from rest_framework import generics, viewsets
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
-
-from users.permissions import IsModer
-
+from rest_framework import viewsets
 from .models import Course, Lesson
 from .serializers import CourseSerializer, LessonSerializer
-
+from rest_framework.permissions import IsAuthenticated
+from users.permissions import IsOwnerOrModer, IsOwnerOrAdmin
 
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
 
     def get_permissions(self):
-        if self.action in ["create", "destroy"]:
-            return [IsAdminUser()]
-        elif self.action in ["update", "partial_update", "list", "retrieve"]:
-            return [IsAuthenticated(), IsModer()]
+        if self.action == "create":
+            return [IsAuthenticated()]
+        elif self.action == "destroy":
+            # удалять может только владелец или админ
+            return [IsAuthenticated(), IsOwnerOrAdmin()]
+        return [IsAuthenticated(), IsOwnerOrModer()]
+
+class LessonViewSet(viewsets.ModelViewSet):
+    queryset = Lesson.objects.all()
+    serializer_class = LessonSerializer
+
+    def get_permissions(self):
+        if self.action == "create":
+            return [IsAuthenticated()]
+        elif self.action in ["update", "partial_update", "retrieve", "list", "destroy"]:
+            return [IsAuthenticated(), IsOwnerOrModer()]
         return [IsAuthenticated()]
-
-
-class CourseCreateAPIView(generics.CreateAPIView):
-    serializer_class = CourseSerializer
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
-
-
-class LessonListCreateView(generics.ListCreateAPIView):
-    queryset = Lesson.objects.all()
-    serializer_class = LessonSerializer
-
-
-class LessonRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Lesson.objects.all()
-    serializer_class = LessonSerializer

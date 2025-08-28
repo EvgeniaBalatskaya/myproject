@@ -1,13 +1,13 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, viewsets
 from rest_framework.filters import OrderingFilter
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
-
+from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
 from users.permissions import IsModer, IsOwner
-
 from .models import CustomUser, Payment
-from .serializers import (CustomUserSerializer, PaymentSerializer,
-                          UserProfileSerializer, UserSerializer)
+from .serializers import (
+    CustomUserSerializer, PaymentSerializer,
+    UserProfileSerializer, UserSerializer
+)
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -15,9 +15,13 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
 
     def get_permissions(self):
-        if self.action in ["create", "destroy"]:
+        if self.action == "create":
+            return [AllowAny()]
+        elif self.action == "destroy":
             return [IsAdminUser()]
-        return [IsAuthenticated(), IsModer()]
+        elif self.action in ["update", "partial_update"]:
+            return [IsAuthenticated(), IsOwner() | IsModer()]
+        return [IsAuthenticated()]
 
 
 class UserProfileAPIView(generics.RetrieveUpdateAPIView):
@@ -26,8 +30,8 @@ class UserProfileAPIView(generics.RetrieveUpdateAPIView):
 
     def get_permissions(self):
         if self.request.method in ["PUT", "PATCH"]:
-            return [IsAuthenticated(), IsOwner()]
-        return [IsAuthenticated(), IsModer()]
+            return [IsAuthenticated(), IsOwner() | IsModer()]
+        return [IsAuthenticated()]
 
 
 class PaymentListView(generics.ListAPIView):
@@ -41,4 +45,4 @@ class PaymentListView(generics.ListAPIView):
 
 class RegisterUserAPIView(generics.CreateAPIView):
     serializer_class = CustomUserSerializer
-    permission_classes = []
+    permission_classes = [AllowAny]
