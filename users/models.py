@@ -1,8 +1,7 @@
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
-from lms.models import Course, Lesson
 
-# ---- Менеджер для кастомного пользователя ----
+
 class CustomUserManager(BaseUserManager):
     use_in_migrations = True
 
@@ -16,30 +15,30 @@ class CustomUserManager(BaseUserManager):
         return user
 
     def create_user(self, email, password=None, **extra_fields):
-        extra_fields.setdefault('is_staff', False)
-        extra_fields.setdefault('is_superuser', False)
+        extra_fields.setdefault("is_staff", False)
+        extra_fields.setdefault("is_superuser", False)
         return self._create_user(email, password, **extra_fields)
 
     def create_superuser(self, email, password=None, **extra_fields):
-        extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", True)
 
-        if extra_fields.get('is_staff') is not True:
-            raise ValueError('Superuser must have is_staff=True.')
-        if extra_fields.get('is_superuser') is not True:
-            raise ValueError('Superuser must have is_superuser=True.')
+        if extra_fields.get("is_staff") is not True:
+            raise ValueError("Superuser must have is_staff=True.")
+        if extra_fields.get("is_superuser") is not True:
+            raise ValueError("Superuser must have is_superuser=True.")
 
         return self._create_user(email, password, **extra_fields)
 
-# ---- Модель пользователя ----
+
 class CustomUser(AbstractUser):
     username = None
     email = models.EmailField(unique=True)
     phone = models.CharField(max_length=20, blank=True, null=True)
     city = models.CharField(max_length=50, blank=True, null=True)
-    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
+    avatar = models.ImageField(upload_to="avatars/", blank=True, null=True)
 
-    USERNAME_FIELD = 'email'
+    USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
 
     objects = CustomUserManager()
@@ -47,16 +46,24 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return self.email
 
-# ---- Модель платежа ----
+
 class Payment(models.Model):
     PAYMENT_METHODS = [
-        ('cash', 'Cash'),
-        ('transfer', 'Transfer'),
+        ("cash", "Cash"),
+        ("transfer", "Transfer"),
     ]
 
-    user = models.ForeignKey('users.CustomUser', on_delete=models.CASCADE)
-    course = models.ForeignKey('lms.Course', on_delete=models.CASCADE, null=True, blank=True)
-    lesson = models.ForeignKey('lms.Lesson', on_delete=models.CASCADE, null=True, blank=True)
+    user = models.ForeignKey("users.CustomUser", on_delete=models.CASCADE)
+    course = models.ForeignKey(
+        "lms.Course",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True)
+    lesson = models.ForeignKey(
+        "lms.Lesson",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     method = models.CharField(max_length=20, choices=PAYMENT_METHODS)
     date = models.DateTimeField()
