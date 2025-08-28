@@ -1,12 +1,11 @@
 from rest_framework import serializers
-
 from .models import Course, Lesson
 
 
 class LessonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Lesson
-        fields = ["id", "title", "description", "preview", "video_link"]
+        fields = ["id", "title", "owner", "course"]  # убрали preview и description, их нет в модели
 
 
 class CourseSerializer(serializers.ModelSerializer):
@@ -18,10 +17,11 @@ class CourseSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "title",
-            "preview",
             "description",
             "lessons",
-            "lesson_count"]
+            "lesson_count",
+            "owner"
+        ]
 
     def get_lesson_count(self, obj):
-        return obj.lesson_set.count()
+        return obj.lessons.count()

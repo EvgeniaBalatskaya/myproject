@@ -1,7 +1,5 @@
 from rest_framework import serializers
-
 from .models import CustomUser, Payment
-
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -12,7 +10,6 @@ class UserSerializer(serializers.ModelSerializer):
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        # без пароля и истории платежей
         fields = ["id", "email", "phone", "city", "avatar"]
 
 
@@ -32,4 +29,13 @@ class CustomUserSerializer(serializers.ModelSerializer):
             "city",
             "avatar",
             "is_staff",
-            "is_superuser"]
+            "is_superuser",
+            "password"
+        ]
+        extra_kwargs = {
+            'password': {'write_only': True}
+        }
+
+    def create(self, validated_data):
+        user = CustomUser.objects.create_user(**validated_data)
+        return user
