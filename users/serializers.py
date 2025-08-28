@@ -7,6 +7,10 @@ class UserSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = ['id', 'email', 'phone', 'city', 'avatar']
 
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['id', 'email', 'phone', 'city', 'avatar']  # без пароля и истории платежей
 
 class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
