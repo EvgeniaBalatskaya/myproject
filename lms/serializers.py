@@ -4,7 +4,9 @@ from .validators import youtube_only_validator
 
 
 class LessonSerializer(serializers.ModelSerializer):
-    video_link = serializers.URLField(validators=[youtube_only_validator], required=False)
+    video_link = serializers.URLField(
+        validators=[youtube_only_validator], required=False
+    )
 
     class Meta:
         model = Lesson
