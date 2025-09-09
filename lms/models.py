@@ -26,6 +26,18 @@ class Lesson(models.Model):
         on_delete=models.CASCADE,
         related_name="lessons"
     )
+    video_link = models.URLField(blank=True, null=True)
 
     def __str__(self):
         return self.title
+
+
+class Subscription(models.Model):
+    user = models.ForeignKey("users.CustomUser", on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ("user", "course")
+
+    def __str__(self):
+        return f"{self.user} → {self.course}"
