@@ -55,6 +55,12 @@ python manage.py createsuperuser
 
 python manage.py runserver
 
+8. Запуск воркера
+celery -A config worker -l info
+
+# Запуск beat (планировщик)
+celery -A config beat -l info
+
 ## 📡 API эндпоинты
 
 Пользователи
