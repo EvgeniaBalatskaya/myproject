@@ -2,12 +2,14 @@ from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.conf import settings
+import stripe
+
 from .models import Course, Lesson, Subscription
 from .serializers import CourseSerializer, LessonSerializer, SubscriptionSerializer
 from .paginators import StandardResultsSetPagination
 from users.permissions import IsOwnerOrModer, IsOwnerOrAdmin
-from django.conf import settings
-import stripe
+from .tasks import send_lesson_update_email  # для Celery
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -38,7 +40,13 @@ class LessonViewSet(viewsets.ModelViewSet):
         return [IsAuthenticated()]
 
     def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
+        lesson = serializer.save(owner=self.request.user)
+        # Запуск асинхронного уведомления
+        send_lesson_update_email.delay(lesson.id)
+
+    def perform_update(self, serializer):
+        lesson = serializer.save()
+        send_lesson_update_email.delay(lesson.id)
 
 
 class SubscriptionViewSet(viewsets.ModelViewSet):
