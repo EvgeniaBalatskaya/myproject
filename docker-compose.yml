@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   backend:
     build: .
@@ -23,9 +21,9 @@ services:
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
@@ -43,9 +41,8 @@ services:
     env_file:
       - .env
     depends_on:
-      - backend
-      - redis
       - db
+      - redis
 
   celery-beat:
     build: .
@@ -55,9 +52,8 @@ services:
     env_file:
       - .env
     depends_on:
-      - backend
-      - redis
       - db
+      - redis
 
 volumes:
   postgres_data:
