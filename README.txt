@@ -11,7 +11,7 @@
 - Ограничения по ролям: **владелец, модератор, админ**
 - Покрытие тестами основных сценариев
 
----
+# Проект онлайн-обучения (DRF + Celery + Redis + PostgreSQL)
 
 ## 🚀 Технологии
 - Python 3.11+
@@ -29,6 +29,7 @@
    git clone https://github.com/EvgeniaBalatskaya/myproject.git
    cd myproject
 
+
 2. Создать и активировать виртуальное окружение:
 
 python -m venv .venv
@@ -41,7 +42,21 @@ pip install -r requirements.txt
 
 4. Создать .env файл по примеру:
 
+Скопируйте `.env_template` в `.env` и укажите свои значения:
+```bash
 cp .env_template .env
+
+Примените миграции:
+
+docker-compose exec backend python manage.py migrate
+
+Создайте суперпользователя:
+
+docker-compose exec backend python manage.py createsuperuser
+
+Теперь проект доступен по адресу:
+
+http://localhost:8000
 
 5. Выполнить миграции:
 
