@@ -1,5 +1,6 @@
 from rest_framework.permissions import BasePermission
 
+
 class IsModer(BasePermission):
     """
     Модератор может просматривать и редактировать объекты,
@@ -12,10 +13,12 @@ class IsModer(BasePermission):
             return True
         return False
 
+
 class IsOwner(BasePermission):
     """Разрешение владельцу объекта."""
     def has_object_permission(self, request, view, obj):
         return getattr(obj, "owner", None) == request.user
+
 
 class IsOwnerOrModer(BasePermission):
     """Разрешение для объекта: владелец или модератор."""
@@ -23,6 +26,7 @@ class IsOwnerOrModer(BasePermission):
         is_owner = getattr(obj, 'owner', None) == request.user
         is_moder = request.user.groups.filter(name="Moderators").exists()
         return is_owner or is_moder
+
 
 class IsOwnerOrAdmin(BasePermission):
     """
